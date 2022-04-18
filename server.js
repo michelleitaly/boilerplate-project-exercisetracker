@@ -27,7 +27,7 @@ const userSchema = mongoose.Schema({
 });
 const logSchema = mongoose.Schema({
   username: { type: String, required: true },
-  count: 1,
+  count: Number,
   _id: String,
   log: [
     {
