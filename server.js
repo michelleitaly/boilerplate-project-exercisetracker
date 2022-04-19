@@ -19,16 +19,16 @@ const exerciseSchema = mongoose.Schema({
   description: { type: String, required: true },
   duration: { type: Number, required: true },
   date: String,
-  _id: String,
+ 
 });
 const userSchema = mongoose.Schema({
   username: { type: String, required: true },
-  _id: String,
+ 
 });
 const logSchema = mongoose.Schema({
   username: { type: String, required: true },
   count: Number,
-  _id: String,
+ 
   log: [
     {
       description: String,
@@ -56,11 +56,20 @@ const listener = app.listen(process.env.PORT || 3000, () => {
 app.post("/api/users",bodyParser.urlencoded({ extended: false }), (req, res)=>{
   //User.findOne()
   //enter ther username, submit and --- res.json({"username":"60018990","_id":"625accf6bd912806f3884f37"}), if username is empty,return error:( ValidationError: Users validation failed: username: Path `username` is required.)
-  let username= req.params.username;
-  console.log("pramas----", req.params);
-  console.log("body----", req.body);
-  let id = req.body._id;
-  res.json({"username": username, "_id": id })
+  let newUser = new User({username: req.body.username });
+
+  console.log("username----", newUser);
+  newUser.save((error, savedUser)=>{
+    if(!error){
+      let resJson ={};
+      resJson["username"]= savedUser.username;
+      resJson["id"]= savedUser.id;
+      //console.log(resJson);
+      res.json(resJson);
+    }else{
+      console.log(error)
+    }
+  } )
 } )
 
 app.post("/api/users/:_id/exercises", (req, res)=>{
