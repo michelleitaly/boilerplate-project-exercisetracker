@@ -5,9 +5,9 @@ require("dotenv").config();
 let bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const res = require("express/lib/response");
-//console.log(process.env.SECRET_KEY,process.env.PORT)
+//console.log(process.env.MONGO_URI,process.env.PORT)
 mongoose
-  .connect(process.env.SECRET_KEY, {
+  .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
