@@ -53,8 +53,14 @@ const listener = app.listen(process.env.PORT || 3000, () => {
 });
 
 
-app.post("/api/users", (req, res)=>{
+app.post("/api/users",bodyParser.urlencoded({ extended: false }), (req, res)=>{
+  //User.findOne()
   //enter ther username, submit and --- res.json({"username":"60018990","_id":"625accf6bd912806f3884f37"}), if username is empty,return error:( ValidationError: Users validation failed: username: Path `username` is required.)
+  let username= req.params.username;
+  console.log("pramas----", req.params);
+  console.log("body----", req.body);
+  let id = req.body._id;
+  res.json({"username": username, "_id": id })
 } )
 
 app.post("/api/users/:_id/exercises", (req, res)=>{
