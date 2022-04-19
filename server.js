@@ -41,6 +41,7 @@ const Exercise = mongoose.model("Exercise", exerciseSchema);
 const User = mongoose.model("user", userSchema);
 const Log = mongoose.model("Log", logSchema);
 
+//test
 
 app.use(cors());
 app.use(express.static("public"));
