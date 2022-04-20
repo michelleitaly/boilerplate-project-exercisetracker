@@ -15,9 +15,11 @@ mongoose
   .catch((err) => console.log(err));
 
 const exerciseSchema = mongoose.Schema({
-  username: { type: String, required: true },
+  // username: { type: String, required: true },
   description: { type: String, required: true },
   duration: { type: Number, required: true },
+  // description:String,
+  // duration: Number,
   date: String,
 
 });
@@ -72,12 +74,12 @@ app.post("/api/users", bodyParser.urlencoded({ extended: false }), (req, res) =>
 
         let newUser = new User({ username: username });
         //console.log("username----", newUser);
-        newUser.save((error, savedUser) => {
+        const savedUser= await newUser.save()
           resJson["username"] = savedUser.username;
           resJson["id"] = savedUser.id;
           //console.log(resJson);
           res.json(resJson);
-        })
+        
       }
     } catch (error) {
       console.log("error--->", error)
@@ -86,24 +88,41 @@ app.post("/api/users", bodyParser.urlencoded({ extended: false }), (req, res) =>
   doWork();
 })
 
+app.get("/api/users", (req, res)=>{
+  // retuen an array of all user 
+  User.find({}, (error, arrayOfUsers)=>{
+    if(!error){
+      res.json(arrayOfUsers)
+    }
+  }) 
+} );
+
+
 app.post("/api/users/:_id/exercises",bodyParser.urlencoded({ extended: false }), (req, res) => {
   let userId = req.params._id;
   let userDuration = req.body.duration;
   let userDescription = req.body.description;
+  console.log(req.body)
   //res.json({"_id":"625acdc3bd912806f3884f3a","username":"15172234","date":"Sat Apr 16 2022","duration":10,"description":"Green pass"})
   async function exercisesLog(){
     try{
-      const dataExist = await User.findOne({ username: username })
-
+      const dataExist = await User.findById({userId})
       let resJson = {};
+      console.log("dataExist--->", dataExist)
       if (dataExist !== null) {
         //data exist
-        resJson["id"] = dataExist.id;
-        resJson["username"] = dataExist.username;
-        //resJson["date"] = dataExist.date;
-        resJson["duration"] = dataExist.userDuration;
-        resJson["description"] = dataExist.userDescription;
+        // let newExercise = new Exercise();
+        // const savedExercise = await newExercise.save({})
+        // console.log("savedExercise-->", savedExercise)
         
+        resJson["id"] = savedExercise.id;
+        resJson["username"] = savedExercise.username;
+        //resJson["date"] = savedExercise.date;
+        resJson["duration"] = savedExercise.userDuration;
+        resJson["description"] = savedExercise.userDescription;
+        console.log("userDuration-->", userDuration)
+        console.log("userDescription-->", userDescription)
+        console.log("resJson--->", resJson)
         res.json(resJson);
 
         //console.log(resJson);
@@ -116,6 +135,7 @@ app.post("/api/users/:_id/exercises",bodyParser.urlencoded({ extended: false }),
       console.log("error'--->", error)
     }
   }
+  exercisesLog();
 });
 app.get("/api/users/:_id/logs?[from][&to][&limit]", (req, res) => {
   let userId = req.params._id;
