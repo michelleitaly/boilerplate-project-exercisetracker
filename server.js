@@ -74,12 +74,12 @@ app.post("/api/users", bodyParser.urlencoded({ extended: false }), (req, res) =>
 
         let newUser = new User({ username: username });
         //console.log("username----", newUser);
-        const savedUser= await newUser.save()
-          resJson["username"] = savedUser.username;
-          resJson["id"] = savedUser.id;
-          //console.log(resJson);
-          res.json(resJson);
-        
+        const savedUser = await newUser.save()
+        resJson["username"] = savedUser.username;
+        resJson["id"] = savedUser.id;
+        //console.log(resJson);
+        res.json(resJson);
+
       }
     } catch (error) {
       console.log("error--->", error)
@@ -88,50 +88,54 @@ app.post("/api/users", bodyParser.urlencoded({ extended: false }), (req, res) =>
   doWork();
 })
 
-app.get("/api/users", (req, res)=>{
+app.get("/api/users", (req, res) => {
   // retuen an array of all user 
-  User.find({}, (error, arrayOfUsers)=>{
-    if(!error){
+  User.find({}, (error, arrayOfUsers) => {
+    if (!error) {
       res.json(arrayOfUsers)
     }
-  }) 
-} );
+  })
+});
 
 
-app.post("/api/users/:_id/exercises",bodyParser.urlencoded({ extended: false }), (req, res) => {
+app.post("/api/users/:_id/exercises", bodyParser.urlencoded({ extended: false }), (req, res) => {
   let userId = req.params._id;
   let userDuration = req.body.duration;
   let userDescription = req.body.description;
   console.log(req.body)
   //res.json({"_id":"625acdc3bd912806f3884f3a","username":"15172234","date":"Sat Apr 16 2022","duration":10,"description":"Green pass"})
-  async function exercisesLog(){
-    try{
-      const dataExist = await User.findById({userId})
+  async function exercisesLog() {
+    try {
+      console.log("userId---", userId)
+      const dataExist = await User.findById(userId)
       let resJson = {};
       console.log("dataExist--->", dataExist)
       if (dataExist !== null) {
         //data exist
-        // let newExercise = new Exercise();
-        // const savedExercise = await newExercise.save({})
-        // console.log("savedExercise-->", savedExercise)
-        
-        resJson["id"] = savedExercise.id;
-        resJson["username"] = savedExercise.username;
-        //resJson["date"] = savedExercise.date;
-        resJson["duration"] = savedExercise.userDuration;
-        resJson["description"] = savedExercise.userDescription;
+        let newExercise = new Exercise({
+          description: userDescription,
+          duration: userDuration,
+          date: req.body.date,
+        });
+        const savedExercise = await newExercise.save({})
+        console.log("savedExercise-->", savedExercise)
+
+        resJson["id"] = userId;
+        resJson["username"] = dataExist.username;
+        //resJson["date"] = dataExist.date;
+        resJson["duration"] = userDuration;
+        resJson["description"] = userDescription;
         console.log("userDuration-->", userDuration)
         console.log("userDescription-->", userDescription)
         console.log("resJson--->", resJson)
         res.json(resJson);
 
-        //console.log(resJson);
-      } else if (dataExist === null){
+      } else if (dataExist === null) {
         //data no exist
         res.json("User No Exist")
       }
 
-    }catch(error){
+    } catch (error) {
       console.log("error'--->", error)
     }
   }
