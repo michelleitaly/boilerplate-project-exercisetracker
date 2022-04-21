@@ -21,11 +21,10 @@ const exerciseSchema = mongoose.Schema({
   // description:String,
   // duration: Number,
   date: String,
-
 });
 const userSchema = mongoose.Schema({
   username: { type: String, required: true },
-
+  log: [exerciseSchema],
 });
 const logSchema = mongoose.Schema({
   username: { type: String, required: true },
@@ -55,94 +54,128 @@ const listener = app.listen(process.env.PORT || 3000, () => {
   console.log("Your app is listening on port " + listener.address().port);
 });
 
+app.post(
+  "/api/users",
+  bodyParser.urlencoded({ extended: false }),
+  (req, res) => {
+    //enter ther username, submit and --- res.json({"username":"60018990","_id":"625accf6bd912806f3884f37"}), if username is empty,return error:( ValidationError: Users validation failed: username: Path `username` is required.)
+    let username = req.body.username;
+    async function doWork() {
+      try {
+        const dataExist = await User.findOne({ username: username });
 
-app.post("/api/users", bodyParser.urlencoded({ extended: false }), (req, res) => {
-  //enter ther username, submit and --- res.json({"username":"60018990","_id":"625accf6bd912806f3884f37"}), if username is empty,return error:( ValidationError: Users validation failed: username: Path `username` is required.)
-  let username = req.body.username
-  async function doWork() {
-    try {
-      const dataExist = await User.findOne({ username: username })
+        let resJson = {};
+        if (dataExist !== null) {
+          resJson["username"] = dataExist.username;
+          resJson["id"] = dataExist.id;
+          res.json(resJson);
 
-      let resJson = {};
-      if (dataExist !== null) {
-        resJson["username"] = dataExist.username;
-        resJson["id"] = dataExist.id;
-        res.json(resJson);
-
-        //console.log(resJson);
-      } else if (dataExist === null) {
-
-        let newUser = new User({ username: username });
-        //console.log("username----", newUser);
-        const savedUser = await newUser.save()
-        resJson["username"] = savedUser.username;
-        resJson["id"] = savedUser.id;
-        //console.log(resJson);
-        res.json(resJson);
-
+          //console.log(resJson);
+        } else if (dataExist === null) {
+          let newUser = new User({ username: username });
+          //console.log("username----", newUser);
+          const savedUser = await newUser.save();
+          resJson["username"] = savedUser.username;
+          resJson["id"] = savedUser.id;
+          //console.log(resJson);
+          res.json(resJson);
+        }
+      } catch (error) {
+        console.log("error--->", error);
       }
-    } catch (error) {
-      console.log("error--->", error)
     }
+    doWork();
   }
-  doWork();
-})
+);
 
 app.get("/api/users", (req, res) => {
-  // retuen an array of all user 
+  // retuen an array of all user
   User.find({}, (error, arrayOfUsers) => {
     if (!error) {
-      res.json(arrayOfUsers)
+      res.json(arrayOfUsers);
     }
-  })
+  });
 });
 
+app.post(
+  "/api/users/:_id/exercises",
+  bodyParser.urlencoded({ extended: false }),
+  (req, res) => {
+    let userId = req.params._id;
+    let userDuration = req.body.duration;
+    let userDescription = req.body.description;
+    let exerciseDate = req.body.date;
+    console.log(req.body);
+    //res.json({"_id":"625acdc3bd912806f3884f3a","username":"15172234","date":"Sat Apr 16 2022","duration":10,"description":"Green pass"})
+    async function exercisesLog() {
+      try {
+        console.log("userId---", userId);
+        const dataExist = await User.findById(userId);
+        let resJson = {};
+        console.log("dataExist--->", dataExist);
+        if (dataExist !== null) {
+          //data exist
+          let newExercise = new Exercise({
+            description: userDescription,
+            duration: userDuration,
+            date: exerciseDate,
+          });
+          console.log("req.body.date--->", req.body.date);
 
-app.post("/api/users/:_id/exercises", bodyParser.urlencoded({ extended: false }), (req, res) => {
-  let userId = req.params._id;
-  let userDuration = req.body.duration;
-  let userDescription = req.body.description;
-  console.log(req.body)
-  //res.json({"_id":"625acdc3bd912806f3884f3a","username":"15172234","date":"Sat Apr 16 2022","duration":10,"description":"Green pass"})
-  async function exercisesLog() {
-    try {
-      console.log("userId---", userId)
-      const dataExist = await User.findById(userId)
-      let resJson = {};
-      console.log("dataExist--->", dataExist)
-      if (dataExist !== null) {
-        //data exist
-        let newExercise = new Exercise({
-          description: userDescription,
-          duration: userDuration,
-          date: req.body.date,
-        });
-        const savedExercise = await newExercise.save({})
-        console.log("savedExercise-->", savedExercise)
+          // const savedExercise = await newExercise.save({})
 
-        resJson["id"] = userId;
-        resJson["username"] = dataExist.username;
-        //resJson["date"] = dataExist.date;
-        resJson["duration"] = userDuration;
-        resJson["description"] = userDescription;
-        console.log("userDuration-->", userDuration)
-        console.log("userDescription-->", userDescription)
-        console.log("resJson--->", resJson)
-        res.json(resJson);
+          // console.log("savedExercise-->", savedExercise)
 
-      } else if (dataExist === null) {
-        //data no exist
-        res.json("User No Exist")
+          let event = exerciseDate !== "" ? new Date(exerciseDate) : new Date();
+          // resJson["date"] =event.toDateString() ;
+
+          const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { $push: { log: newExercise } },
+            { new: true }
+          );
+
+          let resJson = {};
+          resJson["_id"] = updatedUser.id;
+          resJson["username"] = updatedUser.username;
+          resJson["date"] = event.toDateString();
+          resJson["duration"] = newExercise.duration;
+          resJson["description"] = newExercise.description;
+
+          console.log("updatedUser--->", updatedUser);
+
+          // console.log("resJson--->", resJson)
+          res.json(resJson);
+        } else if (dataExist === null) {
+          //data no exist
+          res.json("User No Exist");
+        }
+      } catch (error) {
+        console.log("error'--->", error);
       }
-
-    } catch (error) {
-      console.log("error'--->", error)
     }
+    exercisesLog();
   }
-  exercisesLog();
-});
+);
+app.get(
+  "/api/users/:_id/logs",
+  bodyParser.urlencoded({ extended: false }),
+  (req, res) => {
+    let id = req.params._id;
+    async function userExercisesLog() {
+      try {
+        //try to fix the updated user info first !
+        const exercisesLog = await User.findById(id);
+        res.json(exercisesLog.log);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    userExercisesLog();
+  }
+);
 app.get("/api/users/:_id/logs?[from][&to][&limit]", (req, res) => {
   let userId = req.params._id;
   //
   //
-})
+});
