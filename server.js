@@ -24,6 +24,7 @@ const exerciseSchema = mongoose.Schema({
 });
 const userSchema = mongoose.Schema({
   username: { type: String, required: true },
+  count: Number,
   log: [exerciseSchema],
 });
 const logSchema = mongoose.Schema({
@@ -165,8 +166,16 @@ app.get(
     async function userExercisesLog() {
       try {
         //try to fix the updated user info first !
-        const exercisesLog = await User.findById(id);
-        res.json(exercisesLog.log);
+
+        
+         const exercisesLog = await User.findById(id);
+        console.log("exercisesLog--->", exercisesLog )
+        let exercisesJson = exercisesLog;
+        exercisesJson["count"]= exercisesLog.log.length;
+        console.log("exercisesJson[count]--->", exercisesJson["count"] )
+        console.log(exercisesJson)
+
+        res.json(exercisesJson);
       } catch (error) {
         console.log(error);
       }
