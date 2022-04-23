@@ -21,6 +21,7 @@ const exerciseSchema = mongoose.Schema({
   // description:String,
   // duration: Number,
   date: String,
+  _id: false,
 });
 const userSchema = mongoose.Schema({
   username: { type: String, required: true },
@@ -116,34 +117,38 @@ app.post(
         console.log("dataExist--->", dataExist);
         if (dataExist !== null) {
           //data exist
+          let event = exerciseDate !== "" ? new Date(exerciseDate) : new Date();
+
           let newExercise = new Exercise({
             description: userDescription,
             duration: userDuration,
-            date: exerciseDate,
+            date: event.toDateString(),
           });
           console.log("req.body.date--->", req.body.date);
 
           // const savedExercise = await newExercise.save({})
 
-          // console.log("savedExercise-->", savedExercise)
-
-          let event = exerciseDate !== "" ? new Date(exerciseDate) : new Date();
+          console.log("newExercise-->", newExercise);
           // resJson["date"] =event.toDateString() ;
+
+          //delet Id key in newExercise
+          delete newExercise._id;
 
           const updatedUser = await User.findByIdAndUpdate(
             userId,
             { $push: { log: newExercise } },
+            // {date: event.toDateString() },
             { new: true }
           );
+          console.log("updatedUser--->", updatedUser);
 
           let resJson = {};
           resJson["_id"] = updatedUser.id;
           resJson["username"] = updatedUser.username;
-          resJson["date"] = event.toDateString();
+          resJson["date"] = newExercise.date;
           resJson["duration"] = newExercise.duration;
-          resJson["description"] = newExercise.description;
 
-          console.log("updatedUser--->", updatedUser);
+          resJson["description"] = newExercise.description;
 
           // console.log("resJson--->", resJson)
           res.json(resJson);
@@ -167,13 +172,16 @@ app.get(
       try {
         //try to fix the updated user info first !
 
-        
-         const exercisesLog = await User.findById(id);
-        console.log("exercisesLog--->", exercisesLog )
-        let exercisesJson = exercisesLog;
-        exercisesJson["count"]= exercisesLog.log.length;
-        console.log("exercisesJson[count]--->", exercisesJson["count"] )
-        console.log(exercisesJson)
+        const exercisesLog = await User.findById(id);
+        console.log("exercisesLog--->", exercisesLog);
+        let exercisesJson = {};
+        exercisesJson["_id"] = exercisesLog._id;
+        exercisesJson["username"] = exercisesLog.username;
+        exercisesJson["count"] = exercisesLog.log.length;
+        exercisesJson["log"] = exercisesLog.log;
+
+        console.log("exercisesJson[log]--->", exercisesLog.log);
+        console.log(exercisesJson);
 
         res.json(exercisesJson);
       } catch (error) {
