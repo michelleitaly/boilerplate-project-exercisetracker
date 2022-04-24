@@ -28,21 +28,21 @@ const userSchema = mongoose.Schema({
   count: Number,
   log: [exerciseSchema],
 });
-const logSchema = mongoose.Schema({
-  username: { type: String, required: true },
-  count: Number,
+// const logSchema = mongoose.Schema({
+//   username: { type: String, required: true },
+//   count: Number,
 
-  log: [
-    {
-      description: String,
-      duration: Number,
-      date: String,
-    },
-  ],
-});
+//   log: [
+//     {
+//       description: String,
+//       duration: Number,
+//       date: String,
+//     },
+//   ],
+// });
 const Exercise = mongoose.model("Exercise", exerciseSchema);
 const User = mongoose.model("user", userSchema);
-const Log = mongoose.model("Log", logSchema);
+//const Log = mongoose.model("Log", logSchema);
 
 //test
 
@@ -175,7 +175,8 @@ app.get(
         //try to fix the updated user info first !
 
         const exercisesLog = await User.findById(id);
-       
+        exercisesLog["count"] = exercisesLog.log.length;
+       console.log("exercisesLog--->", exercisesLog)
         let exercisesJson = {};
         exercisesJson["_id"] = exercisesLog._id;
         exercisesJson["username"] = exercisesLog.username;
