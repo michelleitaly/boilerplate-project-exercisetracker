@@ -21,7 +21,7 @@ const exerciseSchema = mongoose.Schema({
   // description:String,
   // duration: Number,
   date: String,
-  _id: false,
+  //_id: false,
 });
 const userSchema = mongoose.Schema({
   username: { type: String, required: true },
@@ -124,6 +124,7 @@ app.post(
             duration: userDuration,
             date: event.toDateString(),
           });
+          newExercise.save();
           console.log("req.body.date--->", req.body.date);
 
           // const savedExercise = await newExercise.save({})
@@ -174,7 +175,12 @@ app.get(
         //try to fix the updated user info first !
 
         const exercisesLog = await User.findById(id);
-
+        // const updatedCount = await User.findByIdAndUpdate(
+        //   userId,
+        //   { $push: { log: newExercise } },
+        //   // {date: event.toDateString() },
+        //   { new: true }
+        // );
         let exercisesJson = {};
         exercisesJson["_id"] = exercisesLog._id;
         exercisesJson["username"] = exercisesLog.username;
