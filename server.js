@@ -104,7 +104,7 @@ app.post(
   bodyParser.urlencoded({ extended: false }),
   (req, res) => {
     let userId = req.params._id;
-    let userDuration = req.body.duration;
+    let userDuration = parseInt(req.body.duration);
     let userDescription = req.body.description;
     let exerciseDate = req.body.date;
     console.log(req.body);
@@ -117,7 +117,7 @@ app.post(
         console.log("dataExist--->", dataExist);
         if (dataExist !== null) {
           //data exist
-          let event = exerciseDate !== "" ? new Date(exerciseDate) : new Date();
+          let event = exerciseDate !== "" ? new Date(exerciseDate) : new Date().toISOString().substring(0, 10);
 
           let newExercise = new Exercise({
             description: userDescription,
@@ -168,19 +168,14 @@ app.get(
   "/api/users/:_id/logs",
   bodyParser.urlencoded({ extended: false }),
   (req, res) => {
-    console.log("asd");
+   
     let id = req.params._id;
     async function userExercisesLog() {
       try {
         //try to fix the updated user info first !
 
         const exercisesLog = await User.findById(id);
-        // const updatedCount = await User.findByIdAndUpdate(
-        //   userId,
-        //   { $push: { log: newExercise } },
-        //   // {date: event.toDateString() },
-        //   { new: true }
-        // );
+       
         let exercisesJson = {};
         exercisesJson["_id"] = exercisesLog._id;
         exercisesJson["username"] = exercisesLog.username;
@@ -197,24 +192,24 @@ app.get(
           fromDate = fromDate.getTime();
           toDate = toDate.getTime();
           console.log("fromDate--->", fromDate);
+          // exercisesLog.log.filter(date => exercisesLog.log.date >= fromDate && exercisesLog.log.date<= toDate )
         }
-        // exercisesLog.log.filter(date => exercisesLog.log.date >= fromDate && exercisesLog.log.date<= toDate )
-        const logJson = exercisesLog.log.filter((exercise) => {
-          let exerciseDate = new Date(exercise.date).getTime();
-          console.log("exerciseDate getTime()--->", exerciseDate);
-
-          console.log("toDate--->", toDate);
-          console.log("exerciseDate after filter--->", exerciseDate);
-          return exerciseDate >= fromDate && exerciseDate <= toDate;
-        });
-        exercisesJson["count"] = logJson.length;
-        exercisesJson["log"] = logJson;
-        console.log("logJson--->", logJson);
-        console.log("req.query.from--->", req.query.from);
-        console.log("req.query.to--->", req.query.to);
-
+          const logJson = exercisesLog.log.filter((exercise) => {
+            let exerciseDate = new Date(exercise.date).getTime();
+            console.log("exerciseDate getTime()--->", exerciseDate);
+            
+            console.log("toDate--->", toDate);
+            console.log("exerciseDate after filter--->", exerciseDate);
+            return exerciseDate >= fromDate && exerciseDate <= toDate;
+          });
+          exercisesJson["count"] = logJson.length;
+          exercisesJson["log"] = logJson;
+          console.log("logJson--->", logJson);
+        // if (req.query.limit){
+        //   exercisesJson["count"] = exercisesLog.slice(0, req.query.limit).length;
+        //   exercisesJson["log"] = exercisesLog.slice(0, req.query.limit)
+        // }
         console.log("exercisesJson[log]--->", exercisesLog.log);
-        console.log(exercisesJson);
 
         res.json(exercisesJson);
       } catch (error) {
