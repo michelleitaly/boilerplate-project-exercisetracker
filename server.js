@@ -21,7 +21,7 @@ const exerciseSchema = mongoose.Schema({
   // description:String,
   // duration: Number,
   date: String,
-  //_id: false,
+  _id: false,
 });
 const userSchema = mongoose.Schema({
   username: { type: String, required: true },
@@ -113,18 +113,18 @@ app.post(
       try {
         console.log("userId---", userId);
         const dataExist = await User.findById(userId);
-        let resJson = {};
+        //let resJson = {};
         console.log("dataExist--->", dataExist);
         if (dataExist !== null) {
           //data exist
-          let event = exerciseDate !== "" ? new Date(exerciseDate) : new Date().toISOString().substring(0, 10);
+          let event = exerciseDate !== "" ? new Date(exerciseDate) : new Date();
 
           let newExercise = new Exercise({
             description: userDescription,
             duration: userDuration,
             date: event.toDateString(),
           });
-          newExercise.save();
+          //newExercise.save();
           console.log("req.body.date--->", req.body.date);
 
           // const savedExercise = await newExercise.save({})
@@ -133,7 +133,7 @@ app.post(
           // resJson["date"] =event.toDateString() ;
 
           //delet Id key in newExercise
-          delete newExercise._id;
+          //delete newExercise._id;
 
           const updatedUser = await User.findByIdAndUpdate(
             userId,
