@@ -69,16 +69,16 @@ app.post(
         let resJson = {};
         if (dataExist !== null) {
           resJson["username"] = dataExist.username;
-          resJson["id"] = dataExist.id;
+          resJson["_id"] = dataExist.id;
           res.json(resJson);
 
-          //console.log(resJson);
+          console.log("username resJson--->", resJson);
         } else if (dataExist === null) {
           let newUser = new User({ username: username });
           //console.log("username----", newUser);
           const savedUser = await newUser.save();
           resJson["username"] = savedUser.username;
-          resJson["id"] = savedUser.id;
+          resJson["_id"] = savedUser.id;
           //console.log(resJson);
           res.json(resJson);
         }
@@ -167,18 +167,45 @@ app.get(
   "/api/users/:_id/logs",
   bodyParser.urlencoded({ extended: false }),
   (req, res) => {
+    console.log("asd");
     let id = req.params._id;
     async function userExercisesLog() {
       try {
         //try to fix the updated user info first !
 
         const exercisesLog = await User.findById(id);
-        console.log("exercisesLog--->", exercisesLog);
+
         let exercisesJson = {};
         exercisesJson["_id"] = exercisesLog._id;
         exercisesJson["username"] = exercisesLog.username;
-        exercisesJson["count"] = exercisesLog.log.length;
-        exercisesJson["log"] = exercisesLog.log;
+
+        let fromDate = new Date(0);
+        let toDate = new Date();
+        if (req.query.from || req.query.to) {
+          if (req.query.from) {
+            fromDate = new Date(req.query.from);
+          }
+          if (req.query.to) {
+            toDate = new Date(req.query.to);
+          }
+          fromDate = fromDate.getTime();
+          toDate = toDate.getTime();
+          console.log("fromDate--->", fromDate);
+        }
+        // exercisesLog.log.filter(date => exercisesLog.log.date >= fromDate && exercisesLog.log.date<= toDate )
+        const logJson = exercisesLog.log.filter((exercise) => {
+          let exerciseDate = new Date(exercise.date).getTime();
+          console.log("exerciseDate getTime()--->", exerciseDate);
+
+          console.log("toDate--->", toDate);
+          console.log("exerciseDate after filter--->", exerciseDate);
+          return exerciseDate >= fromDate && exerciseDate <= toDate;
+        });
+        exercisesJson["count"] = logJson.length;
+        exercisesJson["log"] = logJson;
+        console.log("logJson--->", logJson);
+        console.log("req.query.from--->", req.query.from);
+        console.log("req.query.to--->", req.query.to);
 
         console.log("exercisesJson[log]--->", exercisesLog.log);
         console.log(exercisesJson);
@@ -191,8 +218,3 @@ app.get(
     userExercisesLog();
   }
 );
-app.get("/api/users/:_id/logs?[from][&to][&limit]", (req, res) => {
-  let userId = req.params._id;
-  //
-  //
-});
