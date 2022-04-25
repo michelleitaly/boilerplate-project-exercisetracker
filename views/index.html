@@ -35,8 +35,12 @@
     <script>
       const exerciseForm = document.getElementById("exercise-form");
 
-      exerciseForm.addEventListener("submit", () => {
+      exerciseForm.addEventListener("submit", (e) => {
+        console.log('submit event',e)
         const userId = document.getElementById("uid").value;
+        const date = document.getElementById("date").value;
+        console.log('userId', userId)
+        console.log('date', date)
         exerciseForm.action = `/api/users/${userId}/exercises`;
 
         exerciseForm.submit();
