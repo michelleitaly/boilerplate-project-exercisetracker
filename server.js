@@ -114,10 +114,7 @@ app.post(
     // let exerciseDate = new Date(req.body.date);
     console.log("exerciseDate--->", exerciseDate);
 
-    // if ( exerciseDate.toDateString()=== "Invalid Date") {
-    //   res.json("Invalid Date");
-    // } else {
-    //res.json({"_id":"625acdc3bd912806f3884f3a","username":"15172234","date":"Sat Apr 16 2022","duration":10,"description":"Green pass"})
+  
     async function exercisesLog() {
       try {
         console.log("userId---", userId);
@@ -137,21 +134,12 @@ app.post(
             duration: userDuration,
             date: event.toDateString(),
           });
-          //newExercise.save();
-          // console.log("req.body.date--->", req.body.date);
-
-          // const savedExercise = await newExercise.save({})
-
+         
           console.log("newExercise-->", newExercise);
-          // resJson["date"] =event.toDateString() ;
-
-          //delet Id key in newExercise
-          //delete newExercise._id;
 
           const updatedUser = await User.findByIdAndUpdate(
             userId,
             { $push: { log: newExercise } },
-            // {date: event.toDateString() },
             { new: true }
           );
           console.log("updatedUser--->", updatedUser);
@@ -161,7 +149,6 @@ app.post(
           resJson["username"] = updatedUser.username;
           resJson["date"] = newExercise.date;
           resJson["duration"] = newExercise.duration;
-
           resJson["description"] = newExercise.description;
 
           // console.log("resJson--->", resJson)
@@ -193,7 +180,13 @@ app.get(
         let exercisesJson = {};
         exercisesJson["_id"] = exercisesLog._id;
         exercisesJson["username"] = exercisesLog.username;
-
+       
+        console.log("req.query.limit--->", req.query.limit)
+        if (req.query.limit){
+          exercisesJson["count"] =  exercisesLog.log.slice(0, req.query.limit).length;
+          exercisesLog["log"] =  exercisesLog.log.slice(0, req.query.limit)
+          console.log(" exercisesJson[count]---->",  exercisesJson["count"] )
+        }
         let fromDate = new Date(0);
         let toDate = new Date();
         if (req.query.from || req.query.to) {
@@ -219,10 +212,6 @@ app.get(
         exercisesJson["count"] = logJson.length;
         exercisesJson["log"] = logJson;
         console.log("logJson--->", logJson);
-        // if (req.query.limit){
-        //   exercisesJson["count"] = exercisesLog.slice(0, req.query.limit).length;
-        //   exercisesJson["log"] = exercisesLog.slice(0, req.query.limit)
-        // }
         console.log("exercisesJson[log]--->", exercisesLog.log);
 
         res.json(exercisesJson);
