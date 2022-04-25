@@ -181,12 +181,6 @@ app.get(
         exercisesJson["_id"] = exercisesLog._id;
         exercisesJson["username"] = exercisesLog.username;
        
-        console.log("req.query.limit--->", req.query.limit)
-        if (req.query.limit){
-         // exercisesJson["count"] =  exercisesLog.log.slice(0, req.query.limit).length;
-          exercisesLog.log =  exercisesLog.log.slice(0, req.query.limit)
-          console.log(" exercisesLog.log---->",  exercisesLog.log )
-        }
         let fromDate = new Date(0);
         let toDate = new Date();
         if (req.query.from || req.query.to) {
@@ -204,11 +198,17 @@ app.get(
         const logJson = exercisesLog.log.filter((exercise) => {
           let exerciseDate = new Date(exercise.date).getTime();
           console.log("exerciseDate getTime()--->", exerciseDate);
-
+          
           console.log("toDate--->", toDate);
           console.log("exerciseDate after filter--->", exerciseDate);
           return exerciseDate >= fromDate && exerciseDate <= toDate;
         });
+        console.log("req.query.limit--->", req.query.limit)
+        if (req.query.limit){
+         // exercisesJson["count"] =  exercisesLog.log.slice(0, req.query.limit).length;
+         logJson.log =  logJson.log.slice(0, req.query.limit)
+          console.log(" exercisesLog.log---->",  logJson.log )
+        }
         exercisesJson["count"] = logJson.length;
         exercisesJson["log"] = logJson;
         console.log("logJson--->", logJson);
