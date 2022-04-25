@@ -106,77 +106,82 @@ app.post(
     let userId = req.params._id;
     let userDuration = parseInt(req.body.duration);
     let userDescription = req.body.description;
-    let exerciseDate = req.body.date;
-    console.log(req.body);
-    //res.json({"_id":"625acdc3bd912806f3884f3a","username":"15172234","date":"Sat Apr 16 2022","duration":10,"description":"Green pass"})
-    async function exercisesLog() {
-      try {
-        console.log("userId---", userId);
-        const dataExist = await User.findById(userId);
-        //let resJson = {};
-        console.log("dataExist--->", dataExist);
-        if (dataExist !== null) {
-          //data exist
-          let event = exerciseDate !== "" ? new Date(exerciseDate) : new Date();
+    let exerciseDate = new Date(req.body.date);
+    console.log("exerciseDate--->", exerciseDate);
 
-          let newExercise = new Exercise({
-            description: userDescription,
-            duration: userDuration,
-            date: event.toDateString(),
-          });
-          //newExercise.save();
-          console.log("req.body.date--->", req.body.date);
+    if ( exerciseDate.toDateString()=== "Invalid Date") {
+      res.json("Invalid Date");
+    } else {
+      //res.json({"_id":"625acdc3bd912806f3884f3a","username":"15172234","date":"Sat Apr 16 2022","duration":10,"description":"Green pass"})
+      async function exercisesLog() {
+        try {
+          console.log("userId---", userId);
+          const dataExist = await User.findById(userId);
+          //let resJson = {};
+          console.log("dataExist--->", dataExist);
+          if (dataExist !== null) {
+            //data exist
+            let event =
+              exerciseDate !== "" ? new Date(exerciseDate) : new Date();
 
-          // const savedExercise = await newExercise.save({})
+            let newExercise = new Exercise({
+              description: userDescription,
+              duration: userDuration,
+              date: event.toDateString(),
+            });
+            //newExercise.save();
+            console.log("req.body.date--->", req.body.date);
 
-          console.log("newExercise-->", newExercise);
-          // resJson["date"] =event.toDateString() ;
+            // const savedExercise = await newExercise.save({})
 
-          //delet Id key in newExercise
-          //delete newExercise._id;
+            console.log("newExercise-->", newExercise);
+            // resJson["date"] =event.toDateString() ;
 
-          const updatedUser = await User.findByIdAndUpdate(
-            userId,
-            { $push: { log: newExercise } },
-            // {date: event.toDateString() },
-            { new: true }
-          );
-          console.log("updatedUser--->", updatedUser);
+            //delet Id key in newExercise
+            //delete newExercise._id;
 
-          let resJson = {};
-          resJson["_id"] = updatedUser.id;
-          resJson["username"] = updatedUser.username;
-          resJson["date"] = newExercise.date;
-          resJson["duration"] = newExercise.duration;
+            const updatedUser = await User.findByIdAndUpdate(
+              userId,
+              { $push: { log: newExercise } },
+              // {date: event.toDateString() },
+              { new: true }
+            );
+            console.log("updatedUser--->", updatedUser);
 
-          resJson["description"] = newExercise.description;
+            let resJson = {};
+            resJson["_id"] = updatedUser.id;
+            resJson["username"] = updatedUser.username;
+            resJson["date"] = newExercise.date;
+            resJson["duration"] = newExercise.duration;
 
-          // console.log("resJson--->", resJson)
-          res.json(resJson);
-        } else if (dataExist === null) {
-          //data no exist
-          res.json("User No Exist");
+            resJson["description"] = newExercise.description;
+
+            // console.log("resJson--->", resJson)
+            res.json(resJson);
+          } else if (dataExist === null) {
+            //data no exist
+            res.json("User No Exist");
+          }
+        } catch (error) {
+          console.log("error'--->", error);
         }
-      } catch (error) {
-        console.log("error'--->", error);
       }
+      exercisesLog();
     }
-    exercisesLog();
   }
 );
 app.get(
   "/api/users/:_id/logs",
   bodyParser.urlencoded({ extended: false }),
   (req, res) => {
-   
     let id = req.params._id;
     async function userExercisesLog() {
       try {
         //try to fix the updated user info first !
 
         const exercisesLog = await User.findById(id);
-        exercisesLog["count"] = exercisesLog.log.length;
-       console.log("exercisesLog--->", exercisesLog)
+
+        console.log("exercisesLog--->", exercisesLog);
         let exercisesJson = {};
         exercisesJson["_id"] = exercisesLog._id;
         exercisesJson["username"] = exercisesLog.username;
@@ -195,17 +200,17 @@ app.get(
           console.log("fromDate--->", fromDate);
           // exercisesLog.log.filter(date => exercisesLog.log.date >= fromDate && exercisesLog.log.date<= toDate )
         }
-          const logJson = exercisesLog.log.filter((exercise) => {
-            let exerciseDate = new Date(exercise.date).getTime();
-            console.log("exerciseDate getTime()--->", exerciseDate);
-            
-            console.log("toDate--->", toDate);
-            console.log("exerciseDate after filter--->", exerciseDate);
-            return exerciseDate >= fromDate && exerciseDate <= toDate;
-          });
-          exercisesJson["count"] = logJson.length;
-          exercisesJson["log"] = logJson;
-          console.log("logJson--->", logJson);
+        const logJson = exercisesLog.log.filter((exercise) => {
+          let exerciseDate = new Date(exercise.date).getTime();
+          console.log("exerciseDate getTime()--->", exerciseDate);
+
+          console.log("toDate--->", toDate);
+          console.log("exerciseDate after filter--->", exerciseDate);
+          return exerciseDate >= fromDate && exerciseDate <= toDate;
+        });
+        exercisesJson["count"] = logJson.length;
+        exercisesJson["log"] = logJson;
+        console.log("logJson--->", logJson);
         // if (req.query.limit){
         //   exercisesJson["count"] = exercisesLog.slice(0, req.query.limit).length;
         //   exercisesJson["log"] = exercisesLog.slice(0, req.query.limit)
