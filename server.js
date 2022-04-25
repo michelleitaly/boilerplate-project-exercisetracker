@@ -195,24 +195,27 @@ app.get(
           console.log("fromDate--->", fromDate);
           // exercisesLog.log.filter(date => exercisesLog.log.date >= fromDate && exercisesLog.log.date<= toDate )
         }
-        const logJson = exercisesLog.log.filter((exercise) => {
+        let logJson = exercisesLog.log.filter((exercise) => {
           let exerciseDate = new Date(exercise.date).getTime();
-          console.log("exerciseDate getTime()--->", exerciseDate);
+          // console.log("exerciseDate getTime()--->", exerciseDate);
           
-          console.log("toDate--->", toDate);
-          console.log("exerciseDate after filter--->", exerciseDate);
+          // console.log("toDate--->", toDate);
+          // console.log("exerciseDate after filter--->", exerciseDate);
           return exerciseDate >= fromDate && exerciseDate <= toDate;
         });
         console.log("req.query.limit--->", req.query.limit)
+        
+        console.log("logJson 1--->", logJson);
         if (req.query.limit){
          // exercisesJson["count"] =  exercisesLog.log.slice(0, req.query.limit).length;
-         logJson.log =  logJson.log.slice(0, req.query.limit)
-          console.log(" exercisesLog.log---->",  logJson.log )
+         logJson = logJson.slice(0, req.query.limit)
         }
+         //console.log(" logJson.log---->",  logJson.log )
+         console.log("logJson 2--->", logJson);
+
         exercisesJson["count"] = logJson.length;
         exercisesJson["log"] = logJson;
-        console.log("logJson--->", logJson);
-        console.log("exercisesJson[log]--->", exercisesLog.log);
+       // console.log("exercisesJson[log]--->", exercisesLog.log);
 
         res.json(exercisesJson);
       } catch (error) {
