@@ -103,6 +103,8 @@ app.post(
   "/api/users/:_id/exercises",
   bodyParser.urlencoded({ extended: false }),
   (req, res) => {
+    console.log("req.body.date--->", req.body.date);
+
     let userId = req.params._id;
     let userDuration = parseInt(req.body.duration);
     let userDescription = req.body.description;
@@ -130,7 +132,7 @@ app.post(
               date: event.toDateString(),
             });
             //newExercise.save();
-            console.log("req.body.date--->", req.body.date);
+           // console.log("req.body.date--->", req.body.date);
 
             // const savedExercise = await newExercise.save({})
 
