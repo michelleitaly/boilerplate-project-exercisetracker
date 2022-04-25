@@ -125,7 +125,7 @@ app.post(
           if (dataExist !== null) {
             //data exist
             let event =
-              exerciseDate !== "" ? new Date(exerciseDate) : new Date();
+              exerciseDate !== ""|| undefined ? new Date(exerciseDate) : new Date();
               console.log("exerciseDate empty? undefined?-->", exerciseDate);
 
             let newExercise = new Exercise({
