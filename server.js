@@ -108,12 +108,13 @@ app.post(
     let userId = req.params._id;
     let userDuration = parseInt(req.body.duration);
     let userDescription = req.body.description;
-    let exerciseDate = new Date(req.body.date);
+    let exerciseDate = req.body.date;
+   // let exerciseDate = new Date(req.body.date);
     console.log("exerciseDate--->", exerciseDate);
 
-    if ( exerciseDate.toDateString()=== "Invalid Date") {
-      res.json("Invalid Date");
-    } else {
+    // if ( exerciseDate.toDateString()=== "Invalid Date") {
+    //   res.json("Invalid Date");
+    // } else {
       //res.json({"_id":"625acdc3bd912806f3884f3a","username":"15172234","date":"Sat Apr 16 2022","duration":10,"description":"Green pass"})
       async function exercisesLog() {
         try {
@@ -125,6 +126,7 @@ app.post(
             //data exist
             let event =
               exerciseDate !== "" ? new Date(exerciseDate) : new Date();
+              console.log("exerciseDate empty? undefined?-->", exerciseDate);
 
             let newExercise = new Exercise({
               description: userDescription,
@@ -170,7 +172,7 @@ app.post(
       }
       exercisesLog();
     }
-  }
+  // }
 );
 app.get(
   "/api/users/:_id/logs",
