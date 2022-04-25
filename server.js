@@ -183,9 +183,9 @@ app.get(
        
         console.log("req.query.limit--->", req.query.limit)
         if (req.query.limit){
-          exercisesJson["count"] =  exercisesLog.log.slice(0, req.query.limit).length;
-          exercisesLog["log"] =  exercisesLog.log.slice(0, req.query.limit)
-          console.log(" exercisesJson[count]---->",  exercisesJson["count"] )
+         // exercisesJson["count"] =  exercisesLog.log.slice(0, req.query.limit).length;
+          exercisesLog.log =  exercisesLog.log.slice(0, req.query.limit)
+          console.log(" exercisesLog.log---->",  exercisesLog.log )
         }
         let fromDate = new Date(0);
         let toDate = new Date();
